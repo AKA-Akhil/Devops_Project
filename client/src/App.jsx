@@ -459,7 +459,7 @@ export default function App() {
     <div className="app-shell">
       <main>
         <header className="hero">
-          <p className="badge">Code Summerizer</p>
+          <p className="badge">Devops project</p>
           <h1>Repository Intelligence</h1>
           <p>Analyze architecture, stack, risks, and improvements from a GitHub link.</p>
           <form onSubmit={handleAnalyze} className="analyze-form">

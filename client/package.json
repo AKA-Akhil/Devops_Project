@@ -1,10 +1,11 @@
 {
-  "name": "repo-summarizer-client",
+  "name": "devops-project-client",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "npm run build",
     "build": "vite build",
     "preview": "vite preview"
   },

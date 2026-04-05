@@ -1,0 +1,10 @@
+kubeconfig_path = "~/.kube/config"
+namespace       = "devops-project"
+
+server_image = "ghcr.io/<your-github-username>/devops-project-server:latest"
+client_image = "ghcr.io/<your-github-username>/devops-project-client:latest"
+
+github_token = "replace-with-token"
+model_api_key = "replace-with-model-key"
+model_provider = "gemini"
+model_name = "gemini-2.0-flash"

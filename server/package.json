@@ -1,11 +1,12 @@
 {
-  "name": "repo-summarizer-server",
+  "name": "devops-project-server",
   "version": "1.0.0",
-  "description": "Backend API for Code Summerizer",
+  "description": "Backend API for Devops project",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
+    "test": "node --test",
     "start": "node src/server.js"
   },
   "dependencies": {

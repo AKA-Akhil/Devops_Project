@@ -1,0 +1,30 @@
+---
+- name: Deploy Devops project to Kubernetes
+  hosts: local
+  gather_facts: false
+  vars:
+    namespace: devops-project
+    project_root: "{{ playbook_dir }}/../../.."
+
+  tasks:
+    - name: Ensure namespace exists
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ project_root }}/k8s/namespace.yaml"
+
+    - name: Apply base manifests
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ item }}"
+      loop:
+        - "{{ project_root }}/k8s/configmap.yaml"
+        - "{{ project_root }}/k8s/server-deployment.yaml"
+        - "{{ project_root }}/k8s/server-service.yaml"
+        - "{{ project_root }}/k8s/client-deployment.yaml"
+        - "{{ project_root }}/k8s/client-service.yaml"
+        - "{{ project_root }}/k8s/hpa.yaml"
+
+    - name: Apply ingress manifest
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ project_root }}/k8s/ingress.yaml"

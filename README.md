@@ -1,137 +1,175 @@
-# Code Summerizer
+# Devops project
 
-A unique full-stack GitHub repository intelligence platform.
+Devops project is a full-stack repository intelligence application with a complete DevOps implementation aligned to your rubric.
 
-Paste a GitHub repo URL and get:
+## What is implemented for high rubric score
 
-- Deep summary of the whole codebase
-- Framework and dependency detection
-- Module-level breakdown
-- SVG flowchart visualization
-- Potential issues and package/version conflict checks
-- Future-risk forecast
-- Improvement recommendations and code-quality suggestions
-- Bonus unique insights for roadmap and maintainability
+### 1. Version Control and Collaboration
 
-## Tech Stack
+- Branch strategy and commit conventions: `docs/GIT_WORKFLOW.md`
+- Pull request template: `.github/PULL_REQUEST_TEMPLATE.md`
+- Issue templates (bug + feature): `.github/ISSUE_TEMPLATE/`
 
-- Frontend: React + Vite
-- Backend: Node.js + Express
-- Visualization: Native SVG renderer
-- Data source: GitHub REST API
-- Optional AI enhancement: Gemini API (via `.env`)
+### 2. CI/CD Pipeline (Build + Test + Deploy)
 
-## Project Structure
+- GitHub Actions workflow: `.github/workflows/devops-project-cicd.yml`
+- Build stage:
+  - Install dependencies
+  - Build client
+- Test stage:
+  - Run backend API test (`server/test/health.test.js`)
+- Deploy stage:
+  - Build and push Docker images to GHCR
+  - Apply Kubernetes manifests
+  - Roll out updated images automatically on `main`
 
-```text
-Devops_Project/
-	client/
-		src/
-			App.jsx
-			api.js
-			main.jsx
-			styles.css
-		index.html
-		package.json
-		vite.config.js
-	server/
-		src/
-			llmClient.js
-			repoAnalyzer.js
-			server.js
-		.env.example
-		package.json
-	package.json
-	README.md
-```
+### 3. Containerization and Orchestration
 
-## Setup
+- Backend Docker image: `server/Dockerfile`
+- Frontend Docker image with Nginx: `client/Dockerfile`
+- Nginx API reverse-proxy config: `client/nginx.conf`
+- Local multi-container run: `docker-compose.yml`
+- Kubernetes deployment manifests: `k8s/`
+  - Namespace, ConfigMap, Secret example, Deployments, Services, Ingress, HPA
 
-### 1) Install dependencies
+### 4. Infrastructure as Code (IaC)
 
-From project root, run in separate terminals:
+- Terraform infrastructure: `infra/terraform/`
+- Ansible automation playbook: `infra/ansible/playbooks/deploy-devops-project.yml`
 
-```powershell
-cd client
-npm install
-```
+Detailed mapping to rubric criteria is in `docs/RUBRIC_MAPPING.md`.
+
+## Local development
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- Docker Desktop (already installed by you)
+
+### Run without Docker
+
+1. Install backend dependencies:
 
 ```powershell
 cd server
-npm install
+npm ci
 ```
 
-### 2) Configure environment (optional AI enhancement)
-
-Copy and edit:
+2. Install frontend dependencies:
 
 ```powershell
-cd server
+cd ..\client
+npm ci
+```
+
+3. Configure server environment:
+
+```powershell
+cd ..\server
 Copy-Item .env.example .env
 ```
 
-Set values in `.env`:
-
-- `PORT=8080`
-- `GITHUB_TOKEN=` (optional, for higher GitHub API limits)
-- `MODEL_PROVIDER=gemini`
-- `MODEL_API_KEY=your_api_key`
-- `MODEL_NAME=gemini-2.0-flash`
-
-### 3) Run backend
+4. Start backend:
 
 ```powershell
-cd server
 npm run dev
 ```
 
-### 4) Run frontend
+5. In a new terminal, start frontend:
 
 ```powershell
-cd client
+cd ..\client
 npm run dev
 ```
 
-Open frontend URL shown by Vite (typically `http://localhost:5173`).
+6. Open app: `http://localhost:5173`
 
-## API
+### Run with Docker Compose
 
-### Health
+From project root:
 
-- `GET /api/health`
-
-### Analyze Repository
-
-- `POST /api/analyze`
-- Body:
-
-```json
-{
-	"repoUrl": "https://github.com/owner/repo"
-}
+```powershell
+docker compose up --build -d
 ```
 
-Returns summary, frameworks, dependencies, modules, flowchart, issues, conflicts, risk forecast, and improvement suggestions.
+Open:
 
-## Free Model Recommendation
+- Frontend: `http://localhost:5173`
+- Backend health: `http://localhost:8080/api/health`
 
-For your use case (frequent calls + high daily usage), start with:
+Stop containers:
 
-1. `Gemini 2.0 Flash` (recommended default)
-2. `DeepSeek` API as fallback option
+```powershell
+docker compose down
+```
 
-Why Gemini first:
+## Kubernetes deployment
 
-- Usually generous free-tier limits for development
-- Fast responses for interactive UI workflows
-- Good structured output when prompted for strict JSON
+1. Enable Kubernetes in Docker Desktop:
+   - Open Docker Desktop
+   - Click **Settings**
+   - Click **Kubernetes**
+   - Enable **Enable Kubernetes**
+   - Click **Apply & Restart**
 
-If your daily usage becomes heavy, add caching and queue-based processing to reduce token/API usage.
+2. Apply manifests from project root:
 
-## Next DevOps Phase (When You Are Ready)
+```powershell
+kubectl apply -f k8s
+kubectl get pods -n devops-project
+kubectl get svc -n devops-project
+```
 
-- Dockerize client and server
-- Add CI/CD pipeline (GitHub Actions)
-- Add test and lint gates
-- Add deployment to cloud (Render/Fly.io/Azure)
-- Add monitoring and logs (Prometheus/Grafana/OpenTelemetry)
+3. If you use ingress locally, add host entry:
+
+- `127.0.0.1 devops-project.local`
+
+## GitHub Actions CI/CD setup (first-time)
+
+Go to your repository in GitHub:
+
+1. Click **Settings**
+2. Click **Secrets and variables** -> **Actions**
+3. Click **New repository secret** and add:
+   - `KUBE_CONFIG_DATA`
+   - `DEVOPS_PROJECT_GITHUB_TOKEN`
+   - `DEVOPS_PROJECT_MODEL_API_KEY`
+
+PowerShell command to generate KUBE_CONFIG_DATA value:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("$HOME/.kube/config"))
+```
+
+Run workflow:
+
+1. Open **Actions** tab
+2. Select **Devops project CI CD Pipeline**
+3. Click **Run workflow**
+4. Select branch `main`
+5. Click green **Run workflow** button
+
+## Terraform IaC
+
+```powershell
+cd infra\terraform
+Copy-Item terraform.tfvars.example terraform.tfvars
+terraform init
+terraform plan
+terraform apply -auto-approve
+```
+
+## Ansible deployment automation
+
+```powershell
+cd infra\ansible
+ansible-galaxy collection install -r requirements.yml
+ansible-playbook -i inventory/hosts.ini playbooks/deploy-devops-project.yml
+```
+
+## Supporting docs
+
+- Beginner click-by-click guide: `docs/BEGINNER_DEVOPS_STEPS.md`
+- Git workflow: `docs/GIT_WORKFLOW.md`
+- Rubric mapping: `docs/RUBRIC_MAPPING.md`

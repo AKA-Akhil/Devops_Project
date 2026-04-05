@@ -1,18 +1,19 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { pathToFileURL } from "node:url";
 import { analyzeRepository } from "./repoAnalyzer.js";
 
 dotenv.config();
 
-const app = express();
-const port = process.env.PORT || 8080;
+export const app = express();
+const port = Number(process.env.PORT) || 8080;
 
 app.use(cors());
 app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "repo-summarizer-server" });
+  res.json({ ok: true, service: "Devops project server" });
 });
 
 app.post("/api/analyze", async (req, res) => {
@@ -31,6 +32,12 @@ app.post("/api/analyze", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+export function startServer() {
+  return app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  startServer();
+}

@@ -213,6 +213,16 @@ docker-compose.override.yaml
 # Docker volumes
 docker-volumes/
 
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/.terraform.lock.hcl
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/terraform.tfvars
+
+# Kubernetes local files
+*.kubeconfig
+
 # =============================================================================
 # Test and coverage
 # =============================================================================
