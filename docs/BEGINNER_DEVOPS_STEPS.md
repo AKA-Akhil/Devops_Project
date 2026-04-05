@@ -36,6 +36,10 @@ This file gives exact click-by-click instructions.
    - Click **New repository variable**.
    - Name: `ENABLE_K8S_DEPLOY`
    - Value: `false`
+9. Add deploy runner mode variable:
+   - Click **New repository variable**.
+   - Name: `DEPLOY_RUNNER`
+   - Value: `self-hosted` (for your local Minikube)
 
 PowerShell command for kubeconfig base64:
 
@@ -51,6 +55,30 @@ PowerShell command for kubeconfig base64:
 6. Click green **Run workflow**.
 
 Expected result with beginner setup: Build and Test and Docker Build and Push pass, while Deploy to Kubernetes is skipped.
+
+## 3A. Enable self-hosted runner (required for local Minikube deploy from Actions)
+
+1. Open your GitHub repository page.
+2. Click **Settings**.
+3. Left menu: click **Actions** -> **Runners**.
+4. Click **New self-hosted runner**.
+5. Select platform **Windows** and architecture **x64**.
+6. Follow shown commands in PowerShell exactly.
+    - Example flow from GitHub page:
+       - `mkdir actions-runner; cd actions-runner`
+       - `Invoke-WebRequest -Uri <runner-zip-url> -OutFile actions-runner-win-x64.zip`
+       - `Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64.zip", "$PWD")`
+       - `./config.cmd --url https://github.com/<your-username>/Devops_Project --token <token-from-github-page>`
+       - `./run.cmd`
+
+Keep that runner PowerShell window open while workflow runs.
+
+## 3B. Turn on deploy stage
+
+1. Go to **Settings** -> **Secrets and variables** -> **Actions** -> **Variables**.
+2. Edit `ENABLE_K8S_DEPLOY` and set value to `true`.
+3. Ensure `DEPLOY_RUNNER` is `self-hosted`.
+4. Run workflow from **Actions** tab again.
 
 ## 4. Local Docker deployment
 

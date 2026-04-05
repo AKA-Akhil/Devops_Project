@@ -23,6 +23,9 @@ Devops project is a full-stack repository intelligence application with a comple
   - Apply Kubernetes manifests
   - Roll out updated images automatically on `main`
   - Runs only when repository variable `ENABLE_K8S_DEPLOY=true`
+  - Select runner mode with repository variable `DEPLOY_RUNNER`:
+    - `self-hosted` for local Minikube deployments
+    - `github-hosted` for remote reachable Kubernetes clusters
 
 Note: Minikube kubeconfig from your laptop usually cannot be used by GitHub-hosted runners because it points to local file paths and localhost cluster endpoints.
 

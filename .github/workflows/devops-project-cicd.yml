@@ -97,7 +97,7 @@ jobs:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
     needs: docker_build_and_push
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.ENABLE_K8S_DEPLOY == 'true'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.ENABLE_K8S_DEPLOY == 'true' && vars.DEPLOY_RUNNER == 'github-hosted'
     permissions:
       contents: read
 
@@ -144,6 +144,60 @@ jobs:
             devops-project-client=${{ env.REGISTRY }}/$OWNER/${{ env.CLIENT_IMAGE_NAME }}:${{ github.sha }}
 
       - name: Wait for rollout
+        run: |
+          kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deployment/devops-project-server --timeout=180s
+          kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deployment/devops-project-client --timeout=180s
+
+  deploy_self_hosted:
+    name: Deploy to Kubernetes (Self-Hosted)
+    runs-on: self-hosted
+    needs: docker_build_and_push
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.ENABLE_K8S_DEPLOY == 'true' && vars.DEPLOY_RUNNER == 'self-hosted'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify kubectl context
+        shell: pwsh
+        run: |
+          kubectl version --client
+          kubectl config current-context
+
+      - name: Create namespace
+        shell: pwsh
+        run: kubectl apply -f k8s/namespace.yaml
+
+      - name: Create or update application secret
+        shell: pwsh
+        run: |
+          kubectl -n ${{ env.K8S_NAMESPACE }} create secret generic devops-project-secrets `
+            --from-literal=GITHUB_TOKEN="${{ secrets.DEVOPS_PROJECT_GITHUB_TOKEN }}" `
+            --from-literal=MODEL_API_KEY="${{ secrets.DEVOPS_PROJECT_MODEL_API_KEY }}" `
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply manifests
+        shell: pwsh
+        run: |
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/server-deployment.yaml
+          kubectl apply -f k8s/server-service.yaml
+          kubectl apply -f k8s/client-deployment.yaml
+          kubectl apply -f k8s/client-service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Update deployment images
+        shell: pwsh
+        run: |
+          $owner = "${{ github.repository_owner }}".ToLower()
+          kubectl -n ${{ env.K8S_NAMESPACE }} set image deployment/devops-project-server devops-project-server=${{ env.REGISTRY }}/$owner/${{ env.SERVER_IMAGE_NAME }}:${{ github.sha }}
+          kubectl -n ${{ env.K8S_NAMESPACE }} set image deployment/devops-project-client devops-project-client=${{ env.REGISTRY }}/$owner/${{ env.CLIENT_IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Wait for rollout
+        shell: pwsh
         run: |
           kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deployment/devops-project-server --timeout=180s
           kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deployment/devops-project-client --timeout=180s
