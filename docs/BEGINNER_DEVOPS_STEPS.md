@@ -31,6 +31,11 @@ This file gives exact click-by-click instructions.
 7. Add another secret:
    - Name: `DEVOPS_PROJECT_MODEL_API_KEY`
    - Value: your model provider key.
+8. Add repository variable for deploy control:
+   - Go to **Settings** -> **Secrets and variables** -> **Actions** -> **Variables**.
+   - Click **New repository variable**.
+   - Name: `ENABLE_K8S_DEPLOY`
+   - Value: `false`
 
 PowerShell command for kubeconfig base64:
 
@@ -44,6 +49,8 @@ PowerShell command for kubeconfig base64:
 4. Click **Run workflow** button.
 5. Select branch `main`.
 6. Click green **Run workflow**.
+
+Expected result with beginner setup: Build and Test and Docker Build and Push pass, while Deploy to Kubernetes is skipped.
 
 ## 4. Local Docker deployment
 

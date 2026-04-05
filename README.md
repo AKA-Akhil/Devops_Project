@@ -22,6 +22,9 @@ Devops project is a full-stack repository intelligence application with a comple
   - Build and push Docker images to GHCR
   - Apply Kubernetes manifests
   - Roll out updated images automatically on `main`
+  - Runs only when repository variable `ENABLE_K8S_DEPLOY=true`
+
+Note: Minikube kubeconfig from your laptop usually cannot be used by GitHub-hosted runners because it points to local file paths and localhost cluster endpoints.
 
 ### 3. Containerization and Orchestration
 
@@ -135,6 +138,10 @@ Go to your repository in GitHub:
    - `KUBE_CONFIG_DATA`
    - `DEVOPS_PROJECT_GITHUB_TOKEN`
    - `DEVOPS_PROJECT_MODEL_API_KEY`
+
+4. Click **Variables** (under Secrets and variables) -> **Actions** -> **New repository variable**
+  - Name: `ENABLE_K8S_DEPLOY`
+  - Value: `false` (set `true` only when using a reachable remote Kubernetes cluster)
 
 PowerShell command to generate KUBE_CONFIG_DATA value:
 
