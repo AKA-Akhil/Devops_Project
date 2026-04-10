@@ -4,7 +4,21 @@ namespace       = "devops-project"
 server_image = "ghcr.io/<your-github-username>/devops-project-server:latest"
 client_image = "ghcr.io/<your-github-username>/devops-project-client:latest"
 
-github_token = "replace-with-token"
-model_api_key = "replace-with-model-key"
-model_provider = "gemini"
-model_name = "gemini-2.0-flash"
+github_token   = "replace-with-token"
+model_api_key  = "replace-with-model-key"
+model_provider = "fine-tuned"
+model_name     = "ft:gpt-4o-mini:your-org:devops-project:abc123"
+model_base_url = "https://api.openai.com/v1"
+
+# AWS / RDS
+aws_region          = "us-east-1"
+vpc_id              = "vpc-xxxxxxxxxxxxxxxxx"
+db_subnet_ids       = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-yyyyyyyyyyyyyyyyy"]
+backend_cidr_blocks = ["10.0.0.0/16"]
+db_instance_class   = "db.t3.micro"
+db_allocated_storage = 20
+db_engine_version   = "15"
+db_name             = "devops_project"
+db_username         = "devops_admin"
+db_password         = "replace-with-secure-password"
+db_skip_final_snapshot = false

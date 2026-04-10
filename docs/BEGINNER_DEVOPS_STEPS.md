@@ -30,7 +30,7 @@ This file gives exact click-by-click instructions.
    - Value: your GitHub fine-grained token.
 7. Add another secret:
    - Name: `DEVOPS_PROJECT_MODEL_API_KEY`
-   - Value: your model provider key.
+   - Value: your fine-tuned model API key (e.g., OpenAI API key).
 8. Add repository variable for deploy control:
    - Go to **Settings** -> **Secrets and variables** -> **Actions** -> **Variables**.
    - Click **New repository variable**.
@@ -120,11 +120,12 @@ If using ingress with local host mapping, add to hosts file:
    - `cd infra/terraform`
 2. Copy variables example:
    - PowerShell: `Copy-Item terraform.tfvars.example terraform.tfvars`
-3. Edit `terraform.tfvars` and put real values.
+3. Edit `terraform.tfvars` and put real values (including AWS credentials and RDS settings).
 4. Run:
    - `terraform init`
    - `terraform plan`
    - `terraform apply -auto-approve`
+5. After apply, copy the `rds_endpoint` output value and set it as `DATABASE_URL` in your Render environment.
 
 ## 7. Ansible deployment
 
@@ -132,3 +133,26 @@ If using ingress with local host mapping, add to hosts file:
 2. In `infra/ansible`, run:
    - `ansible-galaxy collection install -r requirements.yml`
    - `ansible-playbook -i inventory/hosts.ini playbooks/deploy-devops-project.yml`
+
+## 8. Deploy frontend to Vercel
+
+1. Sign in at https://vercel.com.
+2. Click **Add New Project** and import the GitHub repository.
+3. Set **Root Directory** to `client`.
+4. Vercel auto-detects Vite; build command: `npm run build`, output: `dist`.
+5. Add environment variable `VITE_API_BASE_URL` pointing to your Render backend URL (e.g., `https://your-backend.onrender.com/api`).
+6. Click **Deploy**.
+
+## 9. Deploy backend to Render
+
+1. Sign in at https://render.com.
+2. Click **New** -> **Web Service** and connect the GitHub repository.
+3. Render detects `render.yaml` automatically and pre-fills the settings.
+4. Set the following environment variables (marked `sync: false` in `render.yaml`):
+   - `GITHUB_TOKEN` — your GitHub fine-grained token
+   - `MODEL_NAME` — your fine-tuned model ID (e.g., `ft:gpt-4o-mini:your-org:devops-project:abc123`)
+   - `MODEL_API_KEY` — your API key
+   - `MODEL_BASE_URL` — API base URL (e.g., `https://api.openai.com/v1`)
+   - `DATABASE_URL` — PostgreSQL connection string from AWS RDS (`rds_endpoint` Terraform output)
+5. Click **Create Web Service**.
+
