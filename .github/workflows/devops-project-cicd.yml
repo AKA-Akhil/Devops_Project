@@ -123,6 +123,7 @@ jobs:
           kubectl -n ${{ env.K8S_NAMESPACE }} create secret generic devops-project-secrets \
             --from-literal=GITHUB_TOKEN="${{ secrets.DEVOPS_PROJECT_GITHUB_TOKEN }}" \
             --from-literal=MODEL_API_KEY="${{ secrets.DEVOPS_PROJECT_MODEL_API_KEY }}" \
+            --from-literal=MODEL_BASE_URL="${{ secrets.DEVOPS_PROJECT_MODEL_BASE_URL }}" \
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Apply manifests
@@ -176,6 +177,7 @@ jobs:
           kubectl -n ${{ env.K8S_NAMESPACE }} create secret generic devops-project-secrets `
             --from-literal=GITHUB_TOKEN="${{ secrets.DEVOPS_PROJECT_GITHUB_TOKEN }}" `
             --from-literal=MODEL_API_KEY="${{ secrets.DEVOPS_PROJECT_MODEL_API_KEY }}" `
+            --from-literal=MODEL_BASE_URL="${{ secrets.DEVOPS_PROJECT_MODEL_BASE_URL }}" `
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Apply manifests
