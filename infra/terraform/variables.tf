@@ -37,13 +37,19 @@ variable "model_api_key" {
 }
 
 variable "model_provider" {
-  description = "Model provider"
+  description = "Model provider (use 'finetuned' for a fine-tuned model served via an OpenAI-compatible endpoint)"
   type        = string
-  default     = "gemini"
+  default     = "finetuned"
 }
 
 variable "model_name" {
-  description = "Model name"
+  description = "Fine-tuned model name, e.g. ft:gpt-4o:your-org:devops-analyzer:xxxx"
   type        = string
-  default     = "gemini-2.0-flash"
+  default     = "ft:gpt-4o:your-org:devops-analyzer:xxxx"
+}
+
+variable "model_base_url" {
+  description = "Base URL for the OpenAI-compatible fine-tuned model endpoint"
+  type        = string
+  default     = "https://api.openai.com/v1"
 }

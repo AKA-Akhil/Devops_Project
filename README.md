@@ -43,6 +43,19 @@ Note: Minikube kubeconfig from your laptop usually cannot be used by GitHub-host
 - Terraform infrastructure: `infra/terraform/`
 - Ansible automation playbook: `infra/ansible/playbooks/deploy-devops-project.yml`
 
+### 5. Deployment Targets
+
+- **Frontend**: Vercel — automatic CDN deploy from GitHub
+- **Backend**: Render — Docker-based web service deploy
+- **Database**: AWS (RDS or DynamoDB)
+- **Orchestration**: AWS EKS for Kubernetes workloads
+
+### 6. AI / ML
+
+- Fine-tuned model served via an OpenAI-compatible endpoint (replaces generic API)
+- Powers the Repository Intelligence analysis feature
+- Configured via `MODEL_PROVIDER=finetuned`, `MODEL_NAME`, `MODEL_BASE_URL`, `MODEL_API_KEY`
+
 Detailed mapping to rubric criteria is in `docs/RUBRIC_MAPPING.md`.
 
 ## Local development
@@ -141,6 +154,7 @@ Go to your repository in GitHub:
    - `KUBE_CONFIG_DATA`
    - `DEVOPS_PROJECT_GITHUB_TOKEN`
    - `DEVOPS_PROJECT_MODEL_API_KEY`
+   - `DEVOPS_PROJECT_MODEL_BASE_URL` (OpenAI-compatible endpoint base URL for the fine-tuned model)
 
 4. Click **Variables** (under Secrets and variables) -> **Actions** -> **New repository variable**
   - Name: `ENABLE_K8S_DEPLOY`
@@ -159,6 +173,47 @@ Run workflow:
 3. Click **Run workflow**
 4. Select branch `main`
 5. Click green **Run workflow** button
+
+## Deployment targets
+
+### Frontend — Vercel
+
+The React/Vite client can be deployed to [Vercel](https://vercel.com) for global CDN delivery:
+
+1. Import the repository in the Vercel dashboard.
+2. Set **Root Directory** to `client`.
+3. Set the environment variable `VITE_API_BASE_URL` to your backend API URL.
+4. Vercel automatically redeploys on every push to `main`.
+
+### Backend — Render
+
+The Express.js server can be deployed to [Render](https://render.com) as a Docker-based web service:
+
+1. Create a new **Web Service** in Render and connect your GitHub repository.
+2. Set **Dockerfile path** to `server/Dockerfile`.
+3. Add environment variables:
+   - `GITHUB_TOKEN`
+   - `MODEL_PROVIDER=finetuned`
+   - `MODEL_API_KEY`
+   - `MODEL_NAME`
+   - `MODEL_BASE_URL`
+4. Render redeploys automatically on push to `main`.
+
+### Database — AWS
+
+Persistent data can be stored in AWS:
+
+- **Amazon RDS** (PostgreSQL/MySQL) for relational data.
+- **Amazon DynamoDB** for key-value / document storage.
+
+Provision the database with Terraform (see `infra/terraform/`) and pass the connection string to the server via an environment variable or Kubernetes Secret.
+
+### Kubernetes / Orchestration — AWS EKS
+
+For production-grade orchestration, deploy the Kubernetes manifests in `k8s/` to an
+[AWS EKS](https://aws.amazon.com/eks/) cluster.  The Terraform configuration in
+`infra/terraform/` manages the namespace, ConfigMap, Secrets, Deployments, and Services.
+Ansible (`infra/ansible/`) automates the rollout.
 
 ## Terraform IaC
 

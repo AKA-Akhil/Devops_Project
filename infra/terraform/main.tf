@@ -18,6 +18,7 @@ resource "kubernetes_config_map_v1" "app_config" {
     PORT           = "8080"
     MODEL_PROVIDER = var.model_provider
     MODEL_NAME     = var.model_name
+    MODEL_BASE_URL = var.model_base_url
   }
 }
 

@@ -5,5 +5,6 @@ metadata:
   namespace: devops-project
 data:
   PORT: "8080"
-  MODEL_PROVIDER: "gemini"
-  MODEL_NAME: "gemini-2.0-flash"
+  MODEL_PROVIDER: "finetuned"
+  MODEL_NAME: "ft:gpt-4o:your-org:devops-analyzer:xxxx"
+  MODEL_BASE_URL: "https://api.openai.com/v1"
