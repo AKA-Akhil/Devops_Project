@@ -37,13 +37,76 @@ variable "model_api_key" {
 }
 
 variable "model_provider" {
-  description = "Model provider"
+  description = "Model provider (fine-tuned or gemini)"
   type        = string
-  default     = "gemini"
+  default     = "fine-tuned"
 }
 
 variable "model_name" {
-  description = "Model name"
+  description = "Fine-tuned model ID or model name"
   type        = string
-  default     = "gemini-2.0-flash"
+  default     = "ft:gpt-4o-mini:your-org:devops-project:abc123"
+}
+
+variable "model_base_url" {
+  description = "Base URL for the model API endpoint (OpenAI-compatible)"
+  type        = string
+  default     = "https://api.openai.com/v1"
+}
+
+# AWS variables
+
+variable "aws_region" {
+  description = "AWS region for RDS and other resources"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_id" {
+  description = "VPC ID where RDS will be deployed"
+  type        = string
+  default     = ""
+}
+
+variable "db_subnet_ids" {
+  description = "List of subnet IDs for the RDS subnet group"
+  type        = list(string)
+  default     = []
+}
+
+variable "backend_cidr_blocks" {
+  description = "CIDR blocks allowed to reach RDS (backend service IPs)"
+  type        = list(string)
+  default     = []
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage for RDS instance in GB"
+  type        = number
+  default     = 20
+}
+
+variable "db_name" {
+  description = "Name of the database to create"
+  type        = string
+  default     = "devops_project"
+}
+
+variable "db_username" {
+  description = "Master username for RDS"
+  type        = string
+  default     = "devops_admin"
+}
+
+variable "db_password" {
+  description = "Master password for RDS"
+  type        = string
+  sensitive   = true
+  default     = ""
 }

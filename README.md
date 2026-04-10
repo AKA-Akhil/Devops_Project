@@ -41,7 +41,22 @@ Note: Minikube kubeconfig from your laptop usually cannot be used by GitHub-host
 ### 4. Infrastructure as Code (IaC)
 
 - Terraform infrastructure: `infra/terraform/`
+  - Kubernetes resources (Namespace, Deployments, Services)
+  - AWS RDS PostgreSQL database (`infra/terraform/aws.tf`)
 - Ansible automation playbook: `infra/ansible/playbooks/deploy-devops-project.yml`
+
+### 5. Production Deployments
+
+- Frontend → **Vercel** (`client/vercel.json`)
+- Backend API → **Render** (`render.yaml`)
+- Database → **AWS RDS** (PostgreSQL, provisioned via Terraform)
+
+### 6. AI Model
+
+- **Fine-tuned model** via OpenAI-compatible API endpoint (replaces generic Gemini)
+- Provider configured via `MODEL_PROVIDER=fine-tuned`
+- Model ID set via `MODEL_NAME` (e.g., `ft:gpt-4o-mini:your-org:devops-project:abc123`)
+- Base URL set via `MODEL_BASE_URL`
 
 Detailed mapping to rubric criteria is in `docs/RUBRIC_MAPPING.md`.
 
@@ -170,6 +185,8 @@ terraform plan
 terraform apply -auto-approve
 ```
 
+After apply, copy the `rds_endpoint` output and set it as `DATABASE_URL` on Render.
+
 ## Ansible deployment automation
 
 ```powershell
@@ -178,8 +195,21 @@ ansible-galaxy collection install -r requirements.yml
 ansible-playbook -i inventory/hosts.ini playbooks/deploy-devops-project.yml
 ```
 
+## Frontend deployment (Vercel)
+
+1. Import repo into Vercel, set root directory to `client`.
+2. Set `VITE_API_BASE_URL` to your Render backend URL.
+3. Deploy — `client/vercel.json` configures build and SPA rewrites automatically.
+
+## Backend deployment (Render)
+
+1. Connect repo to Render — it auto-detects `render.yaml`.
+2. Set secrets: `GITHUB_TOKEN`, `MODEL_NAME`, `MODEL_API_KEY`, `MODEL_BASE_URL`, `DATABASE_URL`.
+3. Deploy.
+
 ## Supporting docs
 
 - Beginner click-by-click guide: `docs/BEGINNER_DEVOPS_STEPS.md`
 - Git workflow: `docs/GIT_WORKFLOW.md`
 - Rubric mapping: `docs/RUBRIC_MAPPING.md`
+- Claude flowchart prompt: `docs/CLAUDE_FLOWCHART_PROMPT.md`
